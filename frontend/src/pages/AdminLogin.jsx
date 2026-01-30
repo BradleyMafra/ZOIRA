@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FormField from "../components/FormField.jsx";
+import { login, setAdminPassword } from "../services/api.js";
 import { login } from "../services/api.js";
 
 const AdminLogin = () => {
@@ -23,6 +24,7 @@ const AdminLogin = () => {
     setError("");
     try {
       await login(credentials);
+      setAdminPassword(credentials.password);
       navigate("/admin");
     } catch (err) {
       setError(err.message);

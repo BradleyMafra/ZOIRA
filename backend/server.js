@@ -49,6 +49,7 @@ const getNow = () => new Date().toISOString();
 const ALLOWED_STATUS = new Set(["OPEN", "IN_PROGRESS", "CLOSED"]);
 const ALLOWED_PRIORITY = new Set(["LOW", "MEDIUM", "HIGH"]);
 
+const requireAdmin = (req, res, next) => {
 const signToken = (payload) => {
   const data = Buffer.from(JSON.stringify(payload)).toString("base64");
   const signature = Buffer.from(`${data}.${SESSION_SECRET}`).toString("base64");

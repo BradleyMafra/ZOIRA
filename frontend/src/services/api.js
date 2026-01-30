@@ -1,4 +1,5 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const ADMIN_PASS_KEY = "adminPass";
 
 const handleResponse = async (response) => {
   if (response.ok) {
@@ -30,40 +31,66 @@ export const login = (payload) =>
   fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include",
     body: JSON.stringify(payload),
   }).then(handleResponse);
 
-export const logout = () =>
-  fetch(`${API_URL}/api/auth/logout`, {
+export const logout = () => {
+  localStorage.removeItem(ADMIN_PASS_KEY);
+  return fetch(`${API_URL}/api/auth/logout`, {
     method: "POST",
-    credentials: "include",
   }).then(handleResponse);
+};
+
+export const setAdminPassword = (password) => {
+  if (password) {
+    localStorage.setItem(ADMIN_PASS_KEY, password);
+  }
+};
+
+export const getAdminPassword = () => localStorage.getItem(ADMIN_PASS_KEY);
+
+const getAdminHeaders = () => {
+  const password = getAdminPassword();
+  return password ? { "X-Admin-Password": password } : {};
+};
+
+const withAdminPassParam = (params = {}) => {
+  const password = getAdminPassword();
+  return password ? { ...params, adminPass: password } : params;
+};
+
+const withAdminPassBody = (payload = {}) => {
+  const password = getAdminPassword();
+  return password ? { ...payload, adminPass: password } : payload;
+};
 
 export const listTickets = (params = {}) => {
-  const query = new URLSearchParams(params);
+  const query = new URLSearchParams(withAdminPassParam(params));
   return fetch(`${API_URL}/api/admin/tickets?${query.toString()}`, {
-    credentials: "include",
+    headers: getAdminHeaders(),
   }).then(handleResponse);
 };
 
 export const getAdminTicket = (id) =>
-  fetch(`${API_URL}/api/admin/tickets/${id}`, {
-    credentials: "include",
-  }).then(handleResponse);
+  fetch(
+    `${API_URL}/api/admin/tickets/${id}?${new URLSearchParams(
+      withAdminPassParam()
+    ).toString()}`,
+    {
+      headers: getAdminHeaders(),
+    }
+  ).then(handleResponse);
 
 export const addAdminMessage = (id, payload) =>
   fetch(`${API_URL}/api/admin/tickets/${id}/messages`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json", ...getAdminHeaders() },
+    body: JSON.stringify(withAdminPassBody(payload)),
   }).then(handleResponse);
 
 export const updateTicket = (id, payload) =>
   fetch(`${API_URL}/api/admin/tickets/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json", ...getAdminHeaders() },
+    body: JSON.stringify(withAdminPassBody(payload)),
   }).then(handleResponse);
