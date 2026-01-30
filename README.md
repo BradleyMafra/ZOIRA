@@ -83,7 +83,7 @@ DB_PATH=./data/tickets.db
 
 ### Frontend (Static Site)
 
-1. Crie um **Static Site** apontando para o diretório `frontend`.
+t1. Crie um **Static Site** apontando para o diretório `frontend`.
 2. Build command: `npm install && npm run build`
 3. Publish directory: `dist`
 4. Variáveis de ambiente:
