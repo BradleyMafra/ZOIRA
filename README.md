@@ -77,7 +77,7 @@ PORT=3001
 FRONTEND_ORIGIN=https://SEU-FRONTEND.onrender.com
 ADMIN_USER=Luiz
 ADMIN_PASS=MeninoDoTi
-SESSION_SECRET=troque-este-segredo
+SESSION_SECRET=segredo
 DB_PATH=./data/tickets.db
 ```
 
