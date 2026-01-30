@@ -92,8 +92,8 @@ app.post("/api/auth/login", loginLimiter, (req, res) => {
   const token = signToken({ user: ADMIN_USER, createdAt: getNow() });
   res.cookie("session", token, {
     httpOnly: true,
-    sameSite: "none",
-    secure: true,
+    sameSite: "lax",
+    secure: false,
     maxAge: 1000 * 60 * 60 * 6,
   });
   return res.json({ ok: true });
