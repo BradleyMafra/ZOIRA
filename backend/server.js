@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import db from "./db.js";
 
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3001;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
 const ADMIN_USER = process.env.ADMIN_USER || "Luiz";
 const ADMIN_PASS = process.env.ADMIN_PASS || "MeninoDoTi";
+const SESSION_SECRET = process.env.SESSION_SECRET || "change-me";
 
 app.use(helmet());
 app.use(morgan("combined"));
@@ -21,6 +23,7 @@ app.use(
   })
 );
 app.use(express.json({ limit: "1mb" }));
+app.use(cookieParser());
 
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -46,13 +49,29 @@ const getNow = () => new Date().toISOString();
 const ALLOWED_STATUS = new Set(["OPEN", "IN_PROGRESS", "CLOSED"]);
 const ALLOWED_PRIORITY = new Set(["LOW", "MEDIUM", "HIGH"]);
 
+const signToken = (payload) => {
+  const data = Buffer.from(JSON.stringify(payload)).toString("base64");
+  const signature = Buffer.from(`${data}.${SESSION_SECRET}`).toString("base64");
+  return `${data}.${signature}`;
+};
+
+const verifyToken = (token) => {
+  if (!token) return null;
+  const [data, signature] = token.split(".");
+  if (!data || !signature) return null;
+  const expected = Buffer.from(`${data}.${SESSION_SECRET}`).toString("base64");
+  if (expected !== signature) return null;
+  try {
+    return JSON.parse(Buffer.from(data, "base64").toString("utf-8"));
+  } catch (error) {
+    return null;
+  }
+};
+
 const requireAdmin = (req, res, next) => {
-  const headerPass =
-    req.headers["x-admin-password"] ||
-    req.headers["x-admin-pass"] ||
-    req.headers["x-admin"];
-  const password = sanitizeText(headerPass);
-  if (!password || password !== ADMIN_PASS) {
+  const token = req.cookies?.session;
+  const payload = verifyToken(token);
+  if (!payload || payload.user !== ADMIN_USER) {
     return res.status(401).json({ error: "Not authorized" });
   }
   return next();
@@ -70,10 +89,18 @@ app.post("/api/auth/login", loginLimiter, (req, res) => {
     return res.status(401).json({ error: "Credenciais inválidas" });
   }
 
+  const token = signToken({ user: ADMIN_USER, createdAt: getNow() });
+  res.cookie("session", token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+    maxAge: 1000 * 60 * 60 * 6,
+  });
   return res.json({ ok: true });
 });
 
 app.post("/api/auth/logout", (req, res) => {
+  res.clearCookie("session");
   res.json({ ok: true });
 });
 

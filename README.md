@@ -77,12 +77,13 @@ PORT=3001
 FRONTEND_ORIGIN=https://SEU-FRONTEND.onrender.com
 ADMIN_USER=Luiz
 ADMIN_PASS=MeninoDoTi
+SESSION_SECRET=troque-este-segredo
 DB_PATH=./data/tickets.db
 ```
 
 ### Frontend (Static Site)
 
-1. Crie um **Static Site** apontando para o diretório `frontend` (defina **Root Directory** como `frontend`).
+t1. Crie um **Static Site** apontando para o diretório `frontend`.
 2. Build command: `npm install && npm run build`
 3. Publish directory: `dist`
 4. Variáveis de ambiente:
@@ -99,6 +100,7 @@ VITE_API_URL=https://SEU-BACKEND.onrender.com
 - `FRONTEND_ORIGIN`: URL do site estático para CORS.
 - `ADMIN_USER`: usuário do admin.
 - `ADMIN_PASS`: senha do admin.
+- `SESSION_SECRET`: segredo da sessão.
 - `DB_PATH`: caminho do SQLite.
 
 ### Frontend
@@ -107,11 +109,6 @@ VITE_API_URL=https://SEU-BACKEND.onrender.com
 
 ## Notas
 
-- As rotas `/api/admin/*` validam a senha enviada pelo frontend no header (`X-Admin-Password`).
-- O frontend salva a senha admin no `localStorage` após o login para reutilizar nas chamadas protegidas.
+- As rotas `/api/admin/*` estão protegidas por cookie de sessão.
 - A abertura de ticket gera uma chave de acesso para inserir mensagens pelo usuário.
 - O rate limit no endpoint público está configurado para 10 requisições/minuto por IP.
-
-## Erro comum no Render (package.json não encontrado)
-
-Se o build falhar com erro de `ENOENT` para `package.json`, significa que o Render está tentando usar o diretório raiz. Ajuste o **Root Directory** do serviço para `backend` (Web Service) ou `frontend` (Static Site).
