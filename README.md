@@ -1,0 +1,117 @@
+# Support Ticket Panel (Render Static Site + API)
+
+Projeto completo com frontend em React (Vite) e backend em Node.js/Express com SQLite.
+
+## Estrutura
+
+```
+.
+├── backend
+│   ├── .env.example
+│   ├── db.js
+│   ├── package.json
+│   ├── seed.js
+│   └── server.js
+└── frontend
+    ├── .env.example
+    ├── index.html
+    ├── package.json
+    ├── vite.config.js
+    └── src
+        ├── App.jsx
+        ├── main.jsx
+        ├── components
+        │   ├── FormField.jsx
+        │   ├── MessageList.jsx
+        │   └── StatusBadge.jsx
+        ├── pages
+        │   ├── AdminDashboard.jsx
+        │   ├── AdminLogin.jsx
+        │   ├── AdminTicket.jsx
+        │   ├── OpenTicket.jsx
+        │   └── TicketDetail.jsx
+        ├── services
+        │   └── api.js
+        └── styles
+            └── global.css
+```
+
+## Rodar localmente
+
+### Backend
+
+```bash
+cd backend
+cp .env.example .env
+npm install
+npm run seed # opcional
+npm run dev
+```
+
+A API ficará em `http://localhost:3001`.
+
+### Frontend
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+A aplicação estará em `http://localhost:5173`.
+
+## Deploy no Render
+
+Se preferir, use o arquivo `render.yaml` na raiz para configurar o deploy automático (Blueprint). Ele já define `rootDir` para `backend` e `frontend`, evitando o erro de `package.json` não encontrado.
+
+### Backend (Web Service)
+
+1. Crie um **Web Service** apontando para o diretório `backend` (defina **Root Directory** como `backend`).
+2. Build command: `npm install`
+3. Start command: `npm start`
+4. Configure as variáveis de ambiente:
+
+```
+PORT=3001
+FRONTEND_ORIGIN=https://SEU-FRONTEND.onrender.com
+ADMIN_USER=Luiz
+ADMIN_PASS=MeninoDoTi
+DB_PATH=./data/tickets.db
+```
+
+### Frontend (Static Site)
+
+1. Crie um **Static Site** apontando para o diretório `frontend` (defina **Root Directory** como `frontend`).
+2. Build command: `npm install && npm run build`
+3. Publish directory: `dist`
+4. Variáveis de ambiente:
+
+```
+VITE_API_URL=https://SEU-BACKEND.onrender.com
+```
+
+## Variáveis de ambiente
+
+### Backend
+
+- `PORT`: porta da API (Render define automaticamente).
+- `FRONTEND_ORIGIN`: URL do site estático para CORS.
+- `ADMIN_USER`: usuário do admin.
+- `ADMIN_PASS`: senha do admin.
+- `DB_PATH`: caminho do SQLite.
+
+### Frontend
+
+- `VITE_API_URL`: URL base da API.
+
+## Notas
+
+- As rotas `/api/admin/*` validam a senha enviada pelo frontend no header (`X-Admin-Password`) ou como `adminPass` na query/body.
+- O frontend salva a senha admin no `localStorage` após o login para reutilizar nas chamadas protegidas.
+- A abertura de ticket gera uma chave de acesso para inserir mensagens pelo usuário.
+- O rate limit no endpoint público está configurado para 10 requisições/minuto por IP.
+
+## Erro comum no Render (package.json não encontrado)
+
+Se o build falhar com erro de `ENOENT` para `package.json`, significa que o Render está tentando usar o diretório raiz. Ajuste o **Root Directory** do serviço para `backend` (Web Service) ou `frontend` (Static Site).
