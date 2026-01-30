@@ -10,8 +10,10 @@ services:
         value: Luiz
       - key: ADMIN_PASS
         value: MeninoDoTi
+      - key: SESSION_SECRET
+        generateValue: true
       - key: FRONTEND_ORIGIN
-        value: https://SEU-FRONTEND.onrender.com
+        value: https://zoira-front-end.onrender.com
       - key: DB_PATH
         value: ./data/tickets.db
   - type: web
@@ -22,4 +24,4 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        value: https://SEU-BACKEND.onrender.com
+        value: https://zoira-tqkl.onrender.com
