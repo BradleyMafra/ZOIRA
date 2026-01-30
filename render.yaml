@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: support-ticket-api
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: ADMIN_USER
+        value: Luiz
+      - key: ADMIN_PASS
+        value: MeninoDoTi
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: FRONTEND_ORIGIN
+        value: https://SEU-FRONTEND.onrender.com
+      - key: DB_PATH
+        value: ./data/tickets.db
+  - type: web
+    name: support-ticket-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://SEU-BACKEND.onrender.com

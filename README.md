@@ -63,9 +63,11 @@ A aplicação estará em `http://localhost:5173`.
 
 ## Deploy no Render
 
+Se preferir, use o arquivo `render.yaml` na raiz para configurar o deploy automático (Blueprint). Ele já define `rootDir` para `backend` e `frontend`, evitando o erro de `package.json` não encontrado.
+
 ### Backend (Web Service)
 
-1. Crie um **Web Service** apontando para o diretório `backend`.
+1. Crie um **Web Service** apontando para o diretório `backend` (defina **Root Directory** como `backend`).
 2. Build command: `npm install`
 3. Start command: `npm start`
 4. Configure as variáveis de ambiente:
