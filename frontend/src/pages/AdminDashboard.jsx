@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import StatusBadge from "../components/StatusBadge.jsx";
 import FormField from "../components/FormField.jsx";
-import { getAdminPassword, listTickets, logout } from "../services/api.js";
+import { listTickets, logout } from "../services/api.js";
 
 const AdminDashboard = () => {
   const [tickets, setTickets] = useState([]);
@@ -16,10 +16,6 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   const loadTickets = async () => {
-    if (!getAdminPassword()) {
-      navigate("/admin/login");
-      return;
-    }
     setLoading(true);
     setError("");
     try {

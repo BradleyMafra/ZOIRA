@@ -4,7 +4,6 @@ import MessageList from "../components/MessageList.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
 import FormField from "../components/FormField.jsx";
 import {
-  getAdminPassword,
   getAdminTicket,
   addAdminMessage,
   updateTicket,
@@ -22,10 +21,6 @@ const AdminTicket = () => {
   const navigate = useNavigate();
 
   const loadTicket = async () => {
-    if (!getAdminPassword()) {
-      navigate("/admin/login");
-      return;
-    }
     setLoading(true);
     setError("");
     try {
